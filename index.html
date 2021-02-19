@@ -20,6 +20,13 @@
         <script src="https://cdn.jsdelivr.net/gh/bgrins/spectrum@1.8.1/spectrum.js"></script>
         
         <style>
+            @font-face {
+                font-family: "SweiMarkerSansCJKtc-Bold";
+                src: url("https://cdn.jsdelivr.net/gh/max32002/swei-marker-sans@2.0/WebFont/CJK%20TC/SweiMarkerSansCJKtc-Bold.woff2") format("woff2"), url("https://cdn.jsdelivr.net/gh/max32002/swei-marker-sans@2.0/WebFont/CJK%20TC/SweiMarkerSansCJKtc-Bold.woff") format("woff");
+                font-display: swap;
+                font-weight: bold;
+            }
+
             html, body {
                 height: 100%;
                 background-color: #e9f7f6;
@@ -27,7 +34,7 @@
             #main {
                 height: 100%;
                 margin: 0 auto;
-                max-width: 540px;
+                /* max-width: 540px; */
                 padding: 0;
                 display: flex;
                 flex-direction: column;
@@ -47,8 +54,11 @@
                 height: 100%;
             }
             
-            .controls, #stage-wrapper {
-                background-color: rgba(0, 0, 0, 0.1);
+            .controls {
+                width: 100%;
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 10px;
             }
         </style>
 
@@ -61,6 +71,7 @@
                         <a class="btn btn-primary" id="savePng" href="#">PNG</a>
                         <a class="btn btn-primary" id="saveJpg" href="#">JPG</a>
                         <a class="btn btn-primary" id="savePdf" href="#">PDF</a>
+                        <label><input id="fontBold" type="checkbox">粗體</label>
                     </div>
                 </div>
                 <div class="row">
@@ -91,6 +102,7 @@
                 pdfBorder: 5
             };
             var theme = {
+                fontFamily: 'sans-serif',
                 colorA: '#ff0'
             };
             var qrcode = null;
@@ -102,50 +114,42 @@
             var f_door = new fabric.Rect({ originY: 'center', originX: 'center', top: 80, left: 80, width: 100, height: 100, fill: theme.colorA });
             var f_door_overlay = new fabric.Rect({ originY: 'center', originX: 'center', top: 84, left: 104, width: 110, height: 110, fill: '#fff', skewY: -13 });
             var f_door_handle = new fabric.Circle({ originY: 'center', originX: 'center', top: 88, left: 58, radius: 4, fill: theme.colorA });
+                
+            var f_logoText = new fabric.Textbox('中\n文安心灴', {
+                left: 73,
+                top: 43,
+                fontFamily: 'sans-serif',
+                lineHeight: 1.2,
+                fontWeight: 'bold',
+                fontSize: 33,
+                textAlign: 'center',
+                fill: '#111',
+                skewY: -16,
+                // hasControls: false,
+                lockMovementX: true,
+                lockMovementY: true
+            });
+            
+            var f_red1 = new fabric.Rect({
+                left: 0,
+                top: 690,
+                width: stage2d.width,
+                height: 100,
+                fill: '#f00'
+            });
+            
+            var f_arrow_rect = new fabric.Rect({ originY: 'center', originX: 'center', top: 900, left: 50, width: 100, height: 50, fill: '#ff0' });
+            var f_arrow_triangle = new fabric.Triangle({ originY: 'center', originX: 'center', top: 900, left: 150, width: 100, height: 100, angle: 90, fill: '#ff0' });
             
             canvas.add(
                 f_door,
                 f_door_overlay,
                 f_door_handle,
+                f_logoText,
+                f_red1,
+                f_arrow_rect,
+                f_arrow_triangle
             );
-            
-            function initStage() {
-                
-                var logoText = new fabric.Textbox('中\n文', {
-                    left: 73,
-                    top: 43,
-                    fontFamily: 'sans-serif',
-                    lineHeight: 1.2,
-                    fontWeight: 'bold',
-                    fontSize: 33,
-                    textAlign: 'center',
-                    fill: '#111',
-                    skewY: -16
-                });
-                canvas.add(logoText);
-                
-                var red1 = new fabric.Rect({
-                    left: 0,
-                    top: 690,
-                    width: stage2d.width,
-                    height: 100,
-                    fill: '#f00'
-                });
-                canvas.add(red1);
-                
-                canvas.add(
-                    new fabric.Rect({ originY: 'center', originX: 'center', top: 900, left: 50, width: 100, height: 50, fill: '#ff0' }),
-                    new fabric.Triangle({ originY: 'center', originX: 'center', top: 900, left: 150, width: 100, height: 100, angle: 90, fill: '#ff0' })
-                );
-            }
-            initStage();
-            
-            function applyTheme() {
-                var fillColorA = {fill: theme.colorA};
-                f_door.set(fillColorA);
-                f_door_handle.set(fillColorA);
-                canvas.renderAll();
-            }
             
             function resizeCanvas() {
                 var containerHeight = $('#stage-wrapper')[0].clientHeight;
@@ -155,23 +159,54 @@
                 canvas.setViewportTransform([zoom, 0, 0, zoom, 0, 0]);
             }
             $(window).resize(resizeCanvas);
-            $(function () {
-                resizeCanvas();
+            $(function () {resizeCanvas();});
+        
+            function applyTheme() {
+                var t_fillColorA = {fill: theme.colorA};
+                f_door.set(t_fillColorA);
+                f_door_handle.set(t_fillColorA);
                 
-                $("#colorA").spectrum({
-                    showInitial: true,
-                    showInput: true,
-                    showPalette: true,
-                    palette: [
-                        ['black', 'white', 'blanchedalmond'],
-                        ['rgb(255, 128, 0);', 'hsv 100 70 50', 'lightyellow']
-                    ],
-                    preferredFormat: "rgb",
-                    change: function (color) {
-                        theme.colorA = color.toHexString();
-                        applyTheme();
-                    }
+                var t_fontFamily = {fontFamily: theme.fontFamily};
+                f_logoText.set(t_fontFamily);
+                
+                canvas.renderAll();
+                resizeCanvas();
+            }
+            
+            $('#applyUrl').click(function() {
+                if (qrcode) canvas.remove(qrcode);
+                fabric.Image.fromURL('https://chart.apis.google.com/chart?cht=qr&choe=UTF-8&chs=300x300&chl='+encodeURIComponent($('#url').val()), function (img) {
+                    qrcode = img;
+                    qrcode.set({
+                        left: stage2d.width/2,
+                        top: 600,
+                        originX: 'center',
+                        originY: 'center'
+                    });
+                    canvas.add(qrcode);
+                }, {
+                    crossOrigin: 'anonymous'
                 });
+            });
+                
+            $("#colorA").spectrum({
+                showInitial: true,
+                showInput: true,
+                showPalette: true,
+                palette: [
+                    ['black', 'white', 'blanchedalmond'],
+                    ['rgb(255, 128, 0);', 'hsv 100 70 50', 'lightyellow']
+                ],
+                preferredFormat: "rgb",
+                change: function (color) {
+                    theme.colorA = color.toHexString();
+                    applyTheme();
+                }
+            });
+            
+            $('#fontBold').click(function () {
+                theme.fontFamily = this.checked ? 'SweiMarkerSansCJKtc-Bold' : 'sans-serif';
+                applyTheme();
             });
             
             function download(ele, format, filename) {
@@ -202,24 +237,6 @@
             document.getElementById('savePng').addEventListener('click', savePng, false);
             document.getElementById('saveJpg').addEventListener('click', saveJpg, false);
             $('#savePdf').click(function() {download(this, 'pdf', 'EOS.pdf');});
-            
-            
-            $('#apply').click(function() {apply();});
-            function apply() {
-                if (qrcode) canvas.remove(qrcode);
-                fabric.Image.fromURL('https://chart.apis.google.com/chart?cht=qr&choe=UTF-8&chs=300x300&chl='+encodeURIComponent($('#url').val()), function (img) {
-                    qrcode = img;
-                    qrcode.set({
-                        left: stage2d.width/2,
-                        top: 600,
-                        originX: 'center',
-                        originY: 'center'
-                    });
-                    canvas.add(qrcode);
-                }, {
-                    crossOrigin: 'anonymous'
-                });
-            }
         </script>
     </body>
 </html>
