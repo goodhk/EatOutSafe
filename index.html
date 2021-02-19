@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" name="viewport">
+        <meta name="format-detection" content="telephone=no">
+        
+        <meta name="author" content="dolphinlihkg">
+        <title>EatOutSafe</title>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bgrins/spectrum@1.8.1/spectrum.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
+        
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/fabric@4.3.1/dist/fabric.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jspdf@2.3.0/dist/polyfills.umd.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jspdf@2.3.0/dist/jspdf.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/bgrins/spectrum@1.8.1/spectrum.js"></script>
+        
+        <style>
+            html, body {
+                height: 100%;
+                background-color: #e9f7f6;
+            }
+            #main {
+                height: 100%;
+                margin: 0 auto;
+                max-width: 540px;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+            #stage-wrapper {
+                flex: 1;
+                /* overflow: auto;
+                overflow: overlay; */
+                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                max-height: 141vw;
+            }
+            #stage-wrapper>canvas {
+                max-height: 100%;
+                height: 100%;
+            }
+            
+            .controls, #stage-wrapper {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+        </style>
+
+    </head>
+    <body>
+        <div id="main" class="container-fluid">
+            <div class="controls">
+                <div class="row">
+                    <div class="col-12">
+                        <a class="btn btn-primary" id="savePng" href="#">PNG</a>
+                        <a class="btn btn-primary" id="saveJpg" href="#">JPG</a>
+                        <a class="btn btn-primary" id="savePdf" href="#">PDF</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-auto">
+                        <input class="form-control" type="text" id="url">
+                    </div>
+                    <div class="col-2">
+                        <button id="apply" class="btn btn-primary">Apply</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <input type="text" id="colorA">
+                    </div>
+                </div>
+            </div>
+            <div id="stage-wrapper">
+                <canvas id="stage"></canvas>
+            </div>
+        </div>
+        
+        <script>
+            const { jsPDF } = window.jspdf;
+            
+            var stage2d = {
+                width: 839,
+                height: 1190,
+                pdfBorder: 5
+            };
+            var theme = {
+                colorA: '#ff0'
+            };
+            var qrcode = null;
+            
+            var canvas = new fabric.Canvas('stage')
+            canvas.setDimensions(stage2d);
+            canvas.setBackgroundColor('white', canvas.renderAll.bind(canvas));
+            
+            var f_door = new fabric.Rect({ originY: 'center', originX: 'center', top: 80, left: 80, width: 100, height: 100, fill: theme.colorA });
+            var f_door_overlay = new fabric.Rect({ originY: 'center', originX: 'center', top: 84, left: 104, width: 110, height: 110, fill: '#fff', skewY: -13 });
+            var f_door_handle = new fabric.Circle({ originY: 'center', originX: 'center', top: 88, left: 58, radius: 4, fill: theme.colorA });
+            
+            canvas.add(
+                f_door,
+                f_door_overlay,
+                f_door_handle,
+            );
+            
+            function initStage() {
+                
+                var logoText = new fabric.Textbox('中\n文', {
+                    left: 73,
+                    top: 43,
+                    fontFamily: 'sans-serif',
+                    lineHeight: 1.2,
+                    fontWeight: 'bold',
+                    fontSize: 33,
+                    textAlign: 'center',
+                    fill: '#111',
+                    skewY: -16
+                });
+                canvas.add(logoText);
+                
+                var red1 = new fabric.Rect({
+                    left: 0,
+                    top: 690,
+                    width: stage2d.width,
+                    height: 100,
+                    fill: '#f00'
+                });
+                canvas.add(red1);
+                
+                canvas.add(
+                    new fabric.Rect({ originY: 'center', originX: 'center', top: 900, left: 50, width: 100, height: 50, fill: '#ff0' }),
+                    new fabric.Triangle({ originY: 'center', originX: 'center', top: 900, left: 150, width: 100, height: 100, angle: 90, fill: '#ff0' })
+                );
+            }
+            initStage();
+            
+            function applyTheme() {
+                var fillColorA = {fill: theme.colorA};
+                f_door.set(fillColorA);
+                f_door_handle.set(fillColorA);
+                canvas.renderAll();
+            }
+            
+            function resizeCanvas() {
+                var containerHeight = $('#stage-wrapper')[0].clientHeight;
+                var ratio = stage2d.width / stage2d.height;
+                var zoom = containerHeight / stage2d.height;
+                canvas.setDimensions({width: containerHeight * ratio, height: containerHeight});
+                canvas.setViewportTransform([zoom, 0, 0, zoom, 0, 0]);
+            }
+            $(window).resize(resizeCanvas);
+            $(function () {
+                resizeCanvas();
+                
+                $("#colorA").spectrum({
+                    showInitial: true,
+                    showInput: true,
+                    showPalette: true,
+                    palette: [
+                        ['black', 'white', 'blanchedalmond'],
+                        ['rgb(255, 128, 0);', 'hsv 100 70 50', 'lightyellow']
+                    ],
+                    preferredFormat: "rgb",
+                    change: function (color) {
+                        theme.colorA = color.toHexString();
+                        applyTheme();
+                    }
+                });
+            });
+            
+            function download(ele, format, filename) {
+                canvas.setDimensions(stage2d);
+                canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+                canvas.discardActiveObject().renderAll();
+                
+                if (format == 'pdf') {
+                    var imgData = canvas.toDataURL({format: 'jpeg', quality: 1});
+                    var pdf = new jsPDF("p", "mm", "a4");
+                    var width = pdf.internal.pageSize.getWidth() - stage2d.pdfBorder*2;
+                    var height = Math.round(width * stage2d.height / stage2d.width);
+                    pdf.addImage(imgData, 'JPEG', stage2d.pdfBorder, stage2d.pdfBorder, width, height);
+                    pdf.save(filename);
+                } else {
+                    ele.href = canvas.toDataURL({format: format, quality: 1});
+                    ele.download = filename;
+                }
+                
+                resizeCanvas();
+            }
+            function savePng(e) {
+                download(this, 'png', 'EOS.png');
+            }
+            function saveJpg(e) {
+                download(this, 'jpeg', 'EOS.jpg');
+            }
+            document.getElementById('savePng').addEventListener('click', savePng, false);
+            document.getElementById('saveJpg').addEventListener('click', saveJpg, false);
+            $('#savePdf').click(function() {download(this, 'pdf', 'EOS.pdf');});
+            
+            
+            $('#apply').click(function() {apply();});
+            function apply() {
+                if (qrcode) canvas.remove(qrcode);
+                fabric.Image.fromURL('https://chart.apis.google.com/chart?cht=qr&choe=UTF-8&chs=300x300&chl='+encodeURIComponent($('#url').val()), function (img) {
+                    qrcode = img;
+                    qrcode.set({
+                        left: stage2d.width/2,
+                        top: 600,
+                        originX: 'center',
+                        originY: 'center'
+                    });
+                    canvas.add(qrcode);
+                }, {
+                    crossOrigin: 'anonymous'
+                });
+            }
+        </script>
+    </body>
+</html>
