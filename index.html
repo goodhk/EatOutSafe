@@ -84,7 +84,11 @@
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <input type="text" id="colorA">
+                        <input type="text" id="i-bg1">
+                        <input type="text" id="i-bg2">
+                        <input type="text" id="i-bg3">
+                        <input type="text" id="i-logoDoor">
+                        <input type="text" id="i-logoText">
                     </div>
                 </div>
             </div>
@@ -99,11 +103,30 @@
             var custom = {
                 url: 'https://goodhk.github.io/EatOutSafe/',
                 text: {
-                    f_logoLeftText: '安\n心'
+                    f_logoLeftText: '安\n心',
+                    f_logoRightText: '留\n名',
+                    f_logoLongTextTc: '安心留名',
+                    f_logoLongTextEn: 'EatOutSafe',
+                    f_sloganTc: '齊來抗疫',
+                    f_sloganEn: 'Now, Let\'s Fight the Virus!',
+                    f_shop: '按此編輯店鋪名稱',
+                    f_title1Tc: '請掃瞄二維碼開啟網頁填寫姓名及聯絡電話',
+                    f_title1En: 'Scan this QR code and fill out the form with your contact information',
+                    f_title2Tc: '提交表格後請向店員出示畫面，謝謝！',
+                    f_title2En: 'Show your screen after the form is submitted, Thank you!',
+                    f_arraw: '本店承諾',
+                    f_note: '‧本店不會查閱所收集的資料，\n資料只會在以防疫為目的的情況下交予衞生防護中心\n‧所有資料保留31天後會盡快銷毀'
                 },
                 theme: {
                     fontFamily: 'sans-serif',
-                    colorA: '#ff0',
+                    bg1: '#EBD717',
+                    bg2: '#E8C50D',
+                    bg3: '#F5D945',
+                    logoDoor: '#E8C40D',
+                    logoText: '#E8C40D',
+                    logoLongText: '#000',
+                    textOnWhite: '#1b1b1b',
+                    textOnBg: '#fff'
                 }
             };
             
@@ -115,46 +138,204 @@
             
             var canvas = new fabric.Canvas('stage')
             canvas.setDimensions(stage2d);
-            canvas.setBackgroundColor('white', canvas.renderAll.bind(canvas));
+            canvas.setBackgroundColor('#fff', canvas.renderAll.bind(canvas));
             
-            var f_door = new fabric.Rect({ originY: 'center', originX: 'center', top: 80, left: 80, width: 100, height: 100, fill: custom.theme.colorA });
-            var f_doorOverlay = new fabric.Rect({ originY: 'center', originX: 'center', top: 84, left: 104, width: 110, height: 110, fill: '#fff', skewY: -13 });
-            var f_doorHandle = new fabric.Circle({ originY: 'center', originX: 'center', top: 88, left: 58, radius: 4, fill: custom.theme.colorA });
+            var f_bg1 = new fabric.Rect({ left: 0, top: 131, width: stage2d.width, height: 108, fill: custom.theme.bg1 });
+            var f_bg2 = new fabric.Rect({ left: 0, top: 239, width: stage2d.width, height: 818, fill: custom.theme.bg2 });
+            var f_arrowRect = new fabric.Rect({ top: 1089, left: 0, width: 242, height: 71, fill: custom.theme.bg3 });
+            var f_arrowTriangle = new fabric.Triangle({ originY: 'center', originX: 'center', top: 1123, left: 272, width: 104, height: 62, angle: 90, fill: custom.theme.bg3 });
+            var f_frame = new fabric.Rect({ left: 0, top: 0, width: stage2d.width - 2, height: stage2d.height - 2, fill: 'transparent', stroke : '#ccc', strokeWidth : 1, selectable: false, hoverCursor: 'default'});
+            
+            var f_door = new fabric.Rect({ top: 25, left: 42, width: 60, height: 85, fill: custom.theme.logoDoor });
+            var f_doorOverlay = new fabric.Rect({ top: 22, left: 59, width: 60, height: 90, fill: '#fff', skewY: -13 });
+            var f_doorHandle = new fabric.Circle({ top: 70, left: 63, radius: 2.5, fill: custom.theme.logoDoor });
                 
             var f_logoLeftText = new fabric.Textbox(custom.text.f_logoLeftText, {
                 id: 'f_logoLeftText',
-                left: 73,
-                top: 43,
+                left: 72,
+                top: 34,
                 fontFamily: custom.theme.fontFamily,
-                lineHeight: 0.95,
+                lineHeight: 0.92,
                 fontWeight: 'bold',
-                fontSize: 33,
+                fontSize: 31,
                 textAlign: 'center',
-                fill: '#111',
-                skewY: -16,
+                fill: custom.theme.logoText,
+                skewY: -15,
                 lockMovementX: true,
-                lockMovementY: true
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
             });
-            
-            var f_red1 = new fabric.Rect({
+            var f_logoRightText = new fabric.Textbox(custom.text.f_logoRightText, {
+                id: 'f_logoRightText',
+                left: 104,
+                top: 38,
+                fontFamily: custom.theme.fontFamily,
+                lineHeight: 0.92,
+                fontWeight: 'bold',
+                fontSize: 31,
+                textAlign: 'center',
+                fill: custom.theme.logoText,
+                skewY: -15,
+                lockMovementX: true,
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
+            });
+            var f_logoLongTextTc = new fabric.Textbox(custom.text.f_logoLongTextTc, {
+                id: 'f_logoLongTextTc',
+                left: 160,
+                top: 40,
+                fontFamily: '',
+                charSpacing: 70,
+                fontWeight: 'bold',
+                fontSize: 25,
+                fill: custom.theme.logoLongText,
+                lockMovementX: true,
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
+            });
+            var f_logoLongTextEn = new fabric.Textbox(custom.text.f_logoLongTextEn, {
+                id: 'f_logoLongTextEn',
+                left: 160,
+                top: 75,
+                fontFamily: '',
+                fontWeight: 'bold',
+                fontSize: 22,
+                fill: custom.theme.logoLongText,
+                lockMovementX: true,
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
+            });
+            var f_sloganTc = new fabric.Textbox(custom.text.f_sloganTc, {
+                id: 'f_sloganTc',
+                left: 580,
+                top: 40,
+                fontFamily: custom.theme.fontFamily,
+                fontWeight: 'bold',
+                fontSize: 26,
+                fill: custom.theme.bg2,
+                lockMovementX: true,
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
+            });
+            var f_sloganEn = new fabric.Textbox(custom.text.f_sloganEn, {
+                id: 'f_sloganEn',
+                left: 580,
+                top: 74,
+                width: 240,
+                fontFamily: custom.theme.fontFamily,
+                fontWeight: 'bold',
+                fontSize: 17,
+                fill: custom.theme.bg2,
+                lockMovementX: true,
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
+            });
+            var f_shop = new fabric.Textbox(custom.text.f_shop, {
+                id: 'f_shop',
                 left: 0,
-                top: 690,
+                originY: 'center',
+                top: 187,
                 width: stage2d.width,
-                height: 100,
-                fill: '#f00'
+                textAlign: 'center',
+                fontFamily: custom.theme.fontFamily,
+                fontSize: 33,
+                fill: custom.theme.textOnWhite,
+                lockMovementX: true,
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
             });
-            
-            var f_arrowRect = new fabric.Rect({ originY: 'center', originX: 'center', top: 900, left: 50, width: 100, height: 50, fill: '#ff0' });
-            var f_arrowTriangle = new fabric.Triangle({ originY: 'center', originX: 'center', top: 900, left: 150, width: 100, height: 100, angle: 90, fill: '#ff0' });
+            var f_title1Tc = new fabric.Textbox(custom.text.f_title1Tc, {
+                id: 'f_title1Tc',
+                left: 0,
+                originY: 'center',
+                top: 320,
+                width: stage2d.width,
+                textAlign: 'center',
+                fontFamily: custom.theme.fontFamily,
+                fontWeight: 'bold',
+                fontSize: 32,
+                fill: custom.theme.textOnBg,
+                lockMovementX: true,
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
+            });
+            var f_title1En = new fabric.Textbox(custom.text.f_title1En, {
+                id: 'f_title1En',
+                left: 0,
+                originY: 'center',
+                top: 370,
+                width: stage2d.width,
+                textAlign: 'center',
+                fontFamily: custom.theme.fontFamily,
+                fontWeight: 'bold',
+                fontSize: 22,
+                fill: custom.theme.textOnBg,
+                lockMovementX: true,
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
+            });
+            var f_title2Tc = new fabric.Textbox(custom.text.f_title2Tc, {
+                id: 'f_title2Tc',
+                left: 0,
+                originY: 'center',
+                top: 940,
+                width: stage2d.width,
+                textAlign: 'center',
+                fontFamily: custom.theme.fontFamily,
+                fontWeight: 'bold',
+                fontSize: 32,
+                fill: custom.theme.textOnBg,
+                lockMovementX: true,
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
+            });
+            var f_title2En = new fabric.Textbox(custom.text.f_title2En, {
+                id: 'f_title2En',
+                left: 0,
+                originY: 'center',
+                top: 990,
+                width: stage2d.width,
+                textAlign: 'center',
+                fontFamily: custom.theme.fontFamily,
+                fontWeight: 'bold',
+                fontSize: 22,
+                fill: custom.theme.textOnBg,
+                lockMovementX: true,
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
+            });
             
             canvas.add(
-                f_red1,
+                f_bg1,
+                f_bg2,
+                f_arrowRect,
+                f_arrowTriangle,
+                f_frame,
                 f_door,
                 f_doorOverlay,
                 f_doorHandle,
                 f_logoLeftText,
-                f_arrowRect,
-                f_arrowTriangle,
+                f_logoRightText,
+                f_logoLongTextTc,
+                f_logoLongTextEn,
+                f_sloganTc,
+                f_sloganEn,
+                f_shop,
+                f_title1Tc,
+                f_title1En,
+                f_title2Tc,
+                f_title2En,
             );
             
             function resizeCanvas() {
@@ -173,11 +354,11 @@
                 $('#applyUrl').text('Loading...');
                 
                 if (qrcode) canvas.remove(qrcode);
-                fabric.Image.fromURL('https://chart.apis.google.com/chart?cht=qr&choe=UTF-8&chs=300x300&chl='+encodeURIComponent(custom.url), function (img) {
+                fabric.Image.fromURL('https://chart.apis.google.com/chart?cht=qr&choe=UTF-8&chs=435x435&chl='+encodeURIComponent(custom.url), function (img) {
                     qrcode = img;
                     qrcode.set({
                         left: stage2d.width/2,
-                        top: 600,
+                        top: 654,
                         originX: 'center',
                         originY: 'center'
                     });
@@ -206,43 +387,108 @@
                     console.log(obj.id);
                     if (custom.text[obj.id]) obj.text = custom.text[obj.id];
                 });
-                canvas.renderAll();
+                canvas.discardActiveObject().renderAll();
             }
             
             canvas.on('text:changed', function (e) {
                 custom.text[e.target.id] = e.target.text;
-                // console.log(custom.text);
             });
         
             function applyTheme() {
-                var t_fillColorA = {fill: custom.theme.colorA};
-                f_door.set(t_fillColorA);
-                f_doorHandle.set(t_fillColorA);
+                f_bg1.set({fill: custom.theme.bg1});
+                f_bg2.set({fill: custom.theme.bg2});
+                f_arrowRect.set({fill: custom.theme.bg3});
+                f_arrowTriangle.set({fill: custom.theme.bg3});
+                f_door.set({fill: custom.theme.logoDoor});
+                f_doorHandle.set({fill: custom.theme.logoDoor});
                 
-                var t_fontFamily = {fontFamily: custom.theme.fontFamily};
-                f_logoLeftText.set(t_fontFamily);
+                f_logoLeftText.set({fill: custom.theme.logoText, fontFamily: custom.theme.fontFamily});
+                f_logoRightText.set({fill: custom.theme.logoText, fontFamily: custom.theme.fontFamily});
+                f_logoLongTextTc.set({fill: custom.theme.logoLongText});
+                f_logoLongTextEn.set({fill: custom.theme.logoLongText});
+                f_sloganTc.set({fill: custom.theme.bg2, fontFamily: custom.theme.fontFamily});
+                f_sloganEn.set({fill: custom.theme.bg2, fontFamily: custom.theme.fontFamily});
+                f_title1Tc.set({fill: custom.theme.textOnBg, fontFamily: custom.theme.fontFamily});
+                f_title1En.set({fill: custom.theme.textOnBg, fontFamily: custom.theme.fontFamily});
+                f_title2Tc.set({fill: custom.theme.textOnBg, fontFamily: custom.theme.fontFamily});
+                f_title2En.set({fill: custom.theme.textOnBg, fontFamily: custom.theme.fontFamily});
                 
-                canvas.renderAll();
-                // resizeCanvas();
+                canvas.discardActiveObject().renderAll();
             }
                 
-            $("#colorA").spectrum({
+            $("#i-bg1").spectrum({
+                color: custom.theme.bg1,
                 showInitial: true,
                 showInput: true,
                 showPalette: true,
                 palette: [
-                    ['black', 'white', 'blanchedalmond'],
-                    ['rgb(255, 128, 0);', 'hsv 100 70 50', 'lightyellow']
+                    [custom.theme.bg1, '#f00'],
                 ],
                 preferredFormat: "rgb",
                 change: function (color) {
-                    custom.theme.colorA = color.toHexString();
+                    custom.theme.bg1 = color.toHexString();
+                    applyTheme();
+                }
+            });
+            $("#i-bg2").spectrum({
+                color: custom.theme.bg2,
+                showInitial: true,
+                showInput: true,
+                showPalette: true,
+                palette: [
+                    [custom.theme.bg2, '#f00'],
+                ],
+                preferredFormat: "rgb",
+                change: function (color) {
+                    custom.theme.bg2 = color.toHexString();
+                    applyTheme();
+                }
+            });
+            $("#i-bg3").spectrum({
+                color: custom.theme.bg3,
+                showInitial: true,
+                showInput: true,
+                showPalette: true,
+                palette: [
+                    [custom.theme.bg3, '#f00'],
+                ],
+                preferredFormat: "rgb",
+                change: function (color) {
+                    custom.theme.bg3 = color.toHexString();
+                    applyTheme();
+                }
+            });
+            $("#i-logoDoor").spectrum({
+                color: custom.theme.logoDoor,
+                showInitial: true,
+                showInput: true,
+                showPalette: true,
+                palette: [
+                    [custom.theme.logoDoor, '#f00'],
+                ],
+                preferredFormat: "rgb",
+                change: function (color) {
+                    custom.theme.logoDoor = color.toHexString();
+                    applyTheme();
+                }
+            });
+            $("#i-logoText").spectrum({
+                color: custom.theme.logoText,
+                showInitial: true,
+                showInput: true,
+                showPalette: true,
+                palette: [
+                    [custom.theme.logoText, '#f00'],
+                ],
+                preferredFormat: "rgb",
+                change: function (color) {
+                    custom.theme.logoText = color.toHexString();
                     applyTheme();
                 }
             });
             
             $('#fontBold').click(function () {
-                custom.theme.fontFamily = this.checked ? 'SweiMarkerSansCJKtc-Bold' : 'sans-serif';
+                custom.theme.fontFamily = this.checked ? 'SweiMarkerSansCJKtc-Bold' : '';
                 applyTheme();
             });
             
