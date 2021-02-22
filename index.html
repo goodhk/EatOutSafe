@@ -31,6 +31,7 @@
                 height: 100%;
                 background-color: #e9f7f6;
                 font-size: 14px;
+                font-family: 'PingFang TC', '.PingFang TC', 'Heiti TC', 'LiHei Pro', 'Microsoft JhengHei', 'Microsoft YaHei', 'Segoe UI', sans-serif;
             }
             #main {
                 height: 100%;
@@ -133,7 +134,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <textarea id="source" rows="10" style="width: 100%"></textarea>
+                        <textarea id="source" rows="10" style="width: 100%; font-family: sans-serif;"></textarea>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
@@ -164,7 +165,7 @@
                     f_note: '‧ 本店不會亦無權核對或查閱所收集的資料\n‧ 資料只會在衞生防護中心要求下交予該中心\n‧ 所有資料保留31天後會盡快銷毀'
                 },
                 theme: {
-                    fontFamily: 'sans-serif',
+                    fontFamily: "'PingFang TC', '.PingFang TC', 'Heiti TC', 'LiHei Pro', 'Microsoft JhengHei', 'Microsoft YaHei', 'Segoe UI', sans-serif",
                     bg1: '#EBD717',
                     bg2: '#E8C50D',
                     bg3: '#F5D945',
@@ -235,7 +236,7 @@
                 left: 160,
                 top: 40,
                 width: 360,
-                fontFamily: '',
+                fontFamily: custom.theme.fontFamily,
                 charSpacing: 70,
                 fontWeight: 'bold',
                 fontSize: 25,
@@ -250,7 +251,7 @@
                 left: 160,
                 top: 75,
                 width: 360,
-                fontFamily: '',
+                fontFamily: custom.theme.fontFamily,
                 fontWeight: 'bold',
                 fontSize: 22,
                 fill: custom.theme.logoLongText,
@@ -489,11 +490,11 @@
                 
                 f_logoLeftText.set({fill: custom.theme.logoText, fontFamily: custom.theme.fontFamily});
                 f_logoRightText.set({fill: custom.theme.logoText, fontFamily: custom.theme.fontFamily});
-                f_logoLongTextTc.set({fill: custom.theme.logoLongText});
-                f_logoLongTextEn.set({fill: custom.theme.logoLongText});
+                f_logoLongTextTc.set({fill: custom.theme.logoLongText, fontFamily: custom.theme.fontFamily});
+                f_logoLongTextEn.set({fill: custom.theme.logoLongText, fontFamily: custom.theme.fontFamily});
                 f_sloganTc.set({fill: custom.theme.bg2, fontFamily: custom.theme.fontFamily});
                 f_sloganEn.set({fill: custom.theme.bg2, fontFamily: custom.theme.fontFamily});
-                f_shop.set({fill: custom.theme.textOnWhite});
+                f_shop.set({fill: custom.theme.textOnWhite, fontFamily: custom.theme.fontFamily});
                 f_title1Tc.set({fill: custom.theme.textOnBg, fontFamily: custom.theme.fontFamily});
                 f_title1En.set({fill: custom.theme.textOnBg, fontFamily: custom.theme.fontFamily});
                 f_title2Tc.set({fill: custom.theme.textOnBg, fontFamily: custom.theme.fontFamily});
