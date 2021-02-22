@@ -30,6 +30,7 @@
             html, body {
                 height: 100%;
                 background-color: #e9f7f6;
+                font-size: 14px;
             }
             #main {
                 height: 100%;
@@ -60,40 +61,85 @@
                 margin: 0 auto;
                 padding: 10px;
             }
+            .h {
+                display: none;
+            }
+            #applyUrl {
+                width: 100%;
+            }
         </style>
 
     </head>
     <body>
         <div id="main" class="container-fluid">
             <div class="controls">
-                <div class="row">
-                    <div class="col-12">
-                        <a class="btn btn-primary" id="savePng" href="#">PNG</a>
-                        <a class="btn btn-primary" id="saveJpg" href="#">JPG</a>
-                        <a class="btn btn-primary" id="savePdf" href="#">PDF</a>
-                        <label><input id="fontBold" type="checkbox">粗體</label>
+                <div class="row justify-content-md-between">
+                    <div class="col-12 col-md-auto pb-2 order-md-2">
+                        <div class="row justify-content-between">
+                            <div class="col-auto text-md-right pr-0">
+                                儲存/匯入:
+                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" id="openModal">
+                                    Text
+                                </button>
+                            </div>
+                            <div class="col-auto text-right">
+                                輸出圖像:
+                                <a class="btn btn-sm btn-primary" id="savePng" href="#">PNG</a>
+                                <a class="btn btn-sm btn-primary" id="saveJpg" href="#">JPG</a>
+                                <a class="btn btn-sm btn-primary" id="savePdf" href="#">PDF</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 d-flex pb-2 order-md-1" style="flex-wrap: nowrap; overflow: hidden">
+                        <div style="min-width: 195px" style="white-space: nowrap">
+                            背景: 
+                            <input type="text" id="i-bg1">
+                            <input type="text" id="i-bg2">
+                            <input type="text" id="i-bg3">
+                        </div>
+                        <div style="flex: 1; white-space: nowrap">
+                            Logo: 
+                            <input type="text" id="i-logoDoor">
+                            <input type="text" id="i-logoText">
+                        </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-10">
+                    <div class="col-8 col-md-10 pr-1">
                         <input class="form-control" type="text" id="url" placeholder="QR Code / Google Form 網址">
                     </div>
-                    <div class="col-2">
+                    <div class="col-4 col-md-2 pl-0">
                         <button id="applyUrl" class="btn btn-primary">更新網址</button>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row h">
                     <div class="col-12">
-                        <input type="text" id="i-bg1">
-                        <input type="text" id="i-bg2">
-                        <input type="text" id="i-bg3">
-                        <input type="text" id="i-logoDoor">
-                        <input type="text" id="i-logoText">
+                        <label><input id="fontBold" type="checkbox">粗體</label>
                     </div>
                 </div>
             </div>
             <div id="stage-wrapper">
                 <canvas id="stage"></canvas>
+            </div>
+        </div>
+        
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">JSON 文字編輯檔</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <textarea id="source" rows="10" style="width: 100%"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+                        <button type="button" class="btn btn-primary" id="saveJson">匯入修改</button>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -113,9 +159,9 @@
                     f_title1Tc: '請掃瞄二維碼開啟網頁填寫姓名及聯絡電話',
                     f_title1En: 'Scan this QR code and fill out the form with your contact information',
                     f_title2Tc: '提交表格後請向店員出示畫面，謝謝！',
-                    f_title2En: 'Show your screen after the form is submitted, Thank you!',
-                    f_arraw: '本店承諾',
-                    f_note: '‧本店不會查閱所收集的資料，\n資料只會在以防疫為目的的情況下交予衞生防護中心\n‧所有資料保留31天後會盡快銷毀'
+                    f_title2En: 'Show your screen after the form is submitted. Thank you!',
+                    f_arrow: '本店承諾     ',
+                    f_note: '‧ 本店不會亦無權核對或查閱所收集的資料\n‧ 資料只會在衞生防護中心要求下交予該中心\n‧ 所有資料保留31天後會盡快銷毀'
                 },
                 theme: {
                     fontFamily: 'sans-serif',
@@ -136,12 +182,14 @@
                 pdfBorder: 5
             };
             
-            var canvas = new fabric.Canvas('stage')
+            var canvas = new fabric.Canvas('stage', {
+                selection: false,
+                backgroundColor: '#fff'
+            });
             canvas.setDimensions(stage2d);
-            canvas.setBackgroundColor('#fff', canvas.renderAll.bind(canvas));
             
-            var f_bg1 = new fabric.Rect({ left: 0, top: 131, width: stage2d.width, height: 108, fill: custom.theme.bg1 });
-            var f_bg2 = new fabric.Rect({ left: 0, top: 239, width: stage2d.width, height: 818, fill: custom.theme.bg2 });
+            var f_bg1 = new fabric.Rect({ left: 0, top: 131, width: stage2d.width, height: 108, fill: custom.theme.bg1, selectable: false, hoverCursor: 'default' });
+            var f_bg2 = new fabric.Rect({ left: 0, top: 239, width: stage2d.width, height: 818, fill: custom.theme.bg2, selectable: false, hoverCursor: 'default' });
             var f_arrowRect = new fabric.Rect({ top: 1089, left: 0, width: 242, height: 71, fill: custom.theme.bg3 });
             var f_arrowTriangle = new fabric.Triangle({ originY: 'center', originX: 'center', top: 1123, left: 272, width: 104, height: 62, angle: 90, fill: custom.theme.bg3 });
             var f_frame = new fabric.Rect({ left: 0, top: 0, width: stage2d.width - 2, height: stage2d.height - 2, fill: 'transparent', stroke : '#ccc', strokeWidth : 1, selectable: false, hoverCursor: 'default'});
@@ -153,12 +201,12 @@
             var f_logoLeftText = new fabric.Textbox(custom.text.f_logoLeftText, {
                 id: 'f_logoLeftText',
                 left: 72,
-                top: 34,
+                top: 10,
+                width: 120,
                 fontFamily: custom.theme.fontFamily,
                 lineHeight: 0.92,
                 fontWeight: 'bold',
                 fontSize: 31,
-                textAlign: 'center',
                 fill: custom.theme.logoText,
                 skewY: -15,
                 lockMovementX: true,
@@ -169,12 +217,12 @@
             var f_logoRightText = new fabric.Textbox(custom.text.f_logoRightText, {
                 id: 'f_logoRightText',
                 left: 104,
-                top: 38,
+                top: 14,
+                width: 120,
                 fontFamily: custom.theme.fontFamily,
                 lineHeight: 0.92,
                 fontWeight: 'bold',
                 fontSize: 31,
-                textAlign: 'center',
                 fill: custom.theme.logoText,
                 skewY: -15,
                 lockMovementX: true,
@@ -186,6 +234,7 @@
                 id: 'f_logoLongTextTc',
                 left: 160,
                 top: 40,
+                width: 360,
                 fontFamily: '',
                 charSpacing: 70,
                 fontWeight: 'bold',
@@ -200,6 +249,7 @@
                 id: 'f_logoLongTextEn',
                 left: 160,
                 top: 75,
+                width: 360,
                 fontFamily: '',
                 fontWeight: 'bold',
                 fontSize: 22,
@@ -213,6 +263,7 @@
                 id: 'f_sloganTc',
                 left: 580,
                 top: 40,
+                width: 240,
                 fontFamily: custom.theme.fontFamily,
                 fontWeight: 'bold',
                 fontSize: 26,
@@ -315,13 +366,45 @@
                 hasControls: false,
                 hoverCursor: 'text'
             });
+            var f_arrow = new fabric.Textbox(custom.text.f_arrow, {
+                id: 'f_arrow',
+                originY: 'center',
+                top: 1125,
+                left: 0,
+                width: 280,
+                textAlign: 'center',
+                fontFamily: custom.theme.fontFamily,
+                fontWeight: 'bold',
+                fontSize: 22,
+                fill: custom.theme.textOnWhite,
+                lockMovementX: true,
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
+            });
+            var f_note = new fabric.Textbox(custom.text.f_note, {
+                id: 'f_note',
+                originY: 'center',
+                top: 1124,
+                left: 330,
+                width: 600,
+                fontFamily: custom.theme.fontFamily,
+                fontWeight: 'bold',
+                fontSize: 22,
+                lineHeight: 1.3,
+                fill: custom.theme.textOnWhite,
+                lockMovementX: true,
+                lockMovementY: true,
+                hasControls: false,
+                hoverCursor: 'text'
+            });
             
             canvas.add(
                 f_bg1,
                 f_bg2,
+                f_frame,
                 f_arrowRect,
                 f_arrowTriangle,
-                f_frame,
                 f_door,
                 f_doorOverlay,
                 f_doorHandle,
@@ -336,6 +419,8 @@
                 f_title1En,
                 f_title2Tc,
                 f_title2En,
+                f_arrow,
+                f_note
             );
             
             function resizeCanvas() {
@@ -408,10 +493,13 @@
                 f_logoLongTextEn.set({fill: custom.theme.logoLongText});
                 f_sloganTc.set({fill: custom.theme.bg2, fontFamily: custom.theme.fontFamily});
                 f_sloganEn.set({fill: custom.theme.bg2, fontFamily: custom.theme.fontFamily});
+                f_shop.set({fill: custom.theme.textOnWhite});
                 f_title1Tc.set({fill: custom.theme.textOnBg, fontFamily: custom.theme.fontFamily});
                 f_title1En.set({fill: custom.theme.textOnBg, fontFamily: custom.theme.fontFamily});
                 f_title2Tc.set({fill: custom.theme.textOnBg, fontFamily: custom.theme.fontFamily});
                 f_title2En.set({fill: custom.theme.textOnBg, fontFamily: custom.theme.fontFamily});
+                f_arrow.set({fill: custom.theme.textOnWhite, fontFamily: custom.theme.fontFamily});
+                f_note.set({fill: custom.theme.textOnWhite, fontFamily: custom.theme.fontFamily});
                 
                 canvas.discardActiveObject().renderAll();
             }
@@ -422,7 +510,7 @@
                 showInput: true,
                 showPalette: true,
                 palette: [
-                    [custom.theme.bg1, '#f00'],
+                    [custom.theme.bg1, '#25C99B'],
                 ],
                 preferredFormat: "rgb",
                 change: function (color) {
@@ -436,7 +524,7 @@
                 showInput: true,
                 showPalette: true,
                 palette: [
-                    [custom.theme.bg2, '#f00'],
+                    [custom.theme.bg2, '#12B288'],
                 ],
                 preferredFormat: "rgb",
                 change: function (color) {
@@ -450,7 +538,7 @@
                 showInput: true,
                 showPalette: true,
                 palette: [
-                    [custom.theme.bg3, '#f00'],
+                    [custom.theme.bg3, '#FFDB2F'],
                 ],
                 preferredFormat: "rgb",
                 change: function (color) {
@@ -464,7 +552,7 @@
                 showInput: true,
                 showPalette: true,
                 palette: [
-                    [custom.theme.logoDoor, '#f00'],
+                    [custom.theme.logoDoor, '#07B288'],
                 ],
                 preferredFormat: "rgb",
                 change: function (color) {
@@ -478,7 +566,7 @@
                 showInput: true,
                 showPalette: true,
                 palette: [
-                    [custom.theme.logoText, '#f00'],
+                    [custom.theme.logoText, '#07B288'],
                 ],
                 preferredFormat: "rgb",
                 change: function (color) {
@@ -490,6 +578,19 @@
             $('#fontBold').click(function () {
                 custom.theme.fontFamily = this.checked ? 'SweiMarkerSansCJKtc-Bold' : '';
                 applyTheme();
+            });
+            
+            $('#openModal').click(function () {
+                $('#exampleModal').modal('show');
+                $('#source').val(JSON.stringify(custom));
+            });
+            
+            $('#saveJson').click(function () {
+                custom = JSON.parse($('#source').val());
+                applyTheme();
+                applyText();
+                applyUrl();
+                $('#exampleModal').modal('hide');
             });
             
             function download(ele, format, filename) {
